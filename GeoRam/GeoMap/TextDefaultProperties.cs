@@ -8,22 +8,23 @@ namespace GeoMapConverter.GeoRam.GeoMap
     [Serializable]
     public class TextDefaultProperties
     {
-        [XmlElement("BCGGroup", DataType = "integer")]
+        [XmlElement("BCGGroup")]
         public string BcgGroup { get; set; }
 
         public Colors Color { get; set; }
 
-        [XmlElement(DataType = "integer")] public string FontSize { get; set; }
+        public int FontSize { get; set; }
 
         public bool Underline { get; set; }
 
         public bool DisplaySetting { get; set; }
 
-        [XmlElement(DataType = "integer")] public string XPixelOffset { get; set; }
+        public int XPixelOffset { get; set; }
 
-        [XmlElement(DataType = "integer")] public string YPixelOffset { get; set; }
+        public int YPixelOffset { get; set; }
 
-        [XmlArrayItem("FilterGroup", DataType = "integer", IsNullable = false)]
-        public List<string> GeoTextFilters { get; set; }
+        [XmlArray("GeoTextFilters")]
+        [XmlArrayItem("FilterGroup")]
+        public string[] GeoTextFilters { get; set; }
     }
 }

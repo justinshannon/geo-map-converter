@@ -8,16 +8,17 @@ namespace GeoMapConverter.GeoRam.GeoMap
     [Serializable]
     public class DefaultSymbolProperties
     {
-        public SymbolTypes SymbolStyle { get; set; }
+        public Vatsim.SymbolStyle SymbolStyle { get; set; }
 
-        [XmlElement("BCGGroup", DataType = "integer")]
+        [XmlElement("BCGGroup")]
         public string BcgGroup { get; set; }
 
         public Colors Color { get; set; }
 
-        [XmlElement(DataType = "integer")] public string FontSize { get; set; }
+        public string FontSize { get; set; }
 
-        [XmlArrayItem("FilterGroup", DataType = "integer", IsNullable = false)]
-        public List<string> GeoSymbolFilters { get; set; }
+        [XmlArray("GeoSymbolFilters")]
+        [XmlArrayItem("FilterGroup")]
+        public string[] GeoSymbolFilters { get; set; }
     }
 }

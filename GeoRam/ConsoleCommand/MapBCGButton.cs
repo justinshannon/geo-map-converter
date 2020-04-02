@@ -10,8 +10,7 @@ namespace GeoMapConverter.GeoRam.ConsoleCommand
         /// <summary>
         /// Gets or sets the position of the button
         /// </summary>
-        [XmlElement(DataType = "integer")]
-        public string MenuPosition { get; set; }
+        public int MenuPosition { get; set; }
 
         /// <summary>
         /// Gets or sets the label for the BCG button
@@ -21,7 +20,9 @@ namespace GeoMapConverter.GeoRam.ConsoleCommand
         /// <summary>
         /// Gets or sets a collection of Geomap BCG groups
         /// </summary>
-        [XmlArrayItem("MapBCGGroup", DataType = "integer", IsNullable = false)]
-        public List<string> MapBcgGroups { get; set; }
+        //[XmlElement("MapBCGGroups")]
+        [XmlArray("MapBCGGroups")]
+        [XmlArrayItem("MapBCGGroup")]
+        public string[] MapBcgGroups { get; set; }
     }
 }

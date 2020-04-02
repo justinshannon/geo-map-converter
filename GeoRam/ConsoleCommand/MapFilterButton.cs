@@ -10,7 +10,6 @@ namespace GeoMapConverter.GeoRam.ConsoleCommand
         /// <summary>
         /// Gets or sets the position of the Geomap filter button
         /// </summary>
-        [XmlElement(DataType = "integer")]
         public string MenuPosition { get; set; }
 
         /// <summary>
@@ -26,9 +25,11 @@ namespace GeoMapConverter.GeoRam.ConsoleCommand
         /// <summary>
         /// Gets or sets a collection of Geomap filter groups
         /// </summary>
-        [XmlArrayItem("MapFilterGroup", DataType = "integer", IsNullable = false)]
-        public List<string> MapFilterGroupsList { get; set; }
+        [XmlArray("MapFilterGroups")]
+        [XmlArrayItem("MapFilterGroup")]
+        public string[] MapFilterGroups { get; set; }
 
-        [XmlIgnore] public string FilterButtonName => $"{LabelLine1} {LabelLine2}";
+        [XmlIgnore]
+        public string FilterButtonName => $"{LabelLine1} {LabelLine2}";
     }
 }

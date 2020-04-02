@@ -10,15 +10,6 @@ namespace GeoMapConverter.GeoRam.GeoMap
     {
         public string LineObjectId { get; set; }
 
-        public LineTypes LineStyle { get; set; }
-
-        [XmlElement("BCGGroup", DataType = "integer")]
-        public string BcgGroup { get; set; }
-
-        public Colors Color { get; set; }
-
-        [XmlElement(DataType = "integer")] public string Thickness { get; set; }
-
         public string StartLatitude { get; set; }
 
         public string StartLongitude { get; set; }
@@ -38,8 +29,5 @@ namespace GeoMapConverter.GeoRam.GeoMap
         public double EndYSpherical { get; set; }
 
         public double EndZSpherical { get; set; }
-
-        [XmlArrayItem("FilterGroup", DataType = "integer", IsNullable = false)]
-        public List<string> GeoLineFilterList { get; set; }
     }
 }

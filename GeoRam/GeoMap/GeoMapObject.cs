@@ -8,7 +8,8 @@ namespace GeoMapConverter.GeoRam.GeoMap
     [Serializable]
     public class GeoMapObject
     {
-        [XmlElement(DataType = "integer")] public string MapGroupId { get; set; }
+        [XmlElement(DataType = "integer")]
+        public string MapGroupId { get; set; }
 
         public ObjectTypes MapObjectType { get; set; }
 
@@ -18,10 +19,13 @@ namespace GeoMapConverter.GeoRam.GeoMap
 
         public TextDefaultProperties TextDefaultProperties { get; set; }
 
-        [XmlElement("GeoMapSymbol")] public List<GeoMapSymbol> GeoMapSymbolList { get; set; }
+        [XmlElement("GeoMapSymbol")]
+        public List<GeoMapSymbol> GeoMapSymbolList { get; set; }
 
-        [XmlElement("GeoMapLine")] public List<GeoMapLine> GeoMapLineList { get; set; }
+        [XmlElement("GeoMapLine")]
+        public List<GeoMapLine> GeoMapLineList { get; set; }
 
-        [XmlElement("GeoMapText")] public List<GeoMapText> GeoMapTextList { get; set; }
+        [XmlElement("GeoMapText")]
+        public List<GeoMapText> GeoMapTextList { get; set; }
     }
 }

@@ -8,16 +8,17 @@ namespace GeoMapConverter.GeoRam.GeoMap
     [Serializable]
     public class DefaultLineProperties
     {
-        public LineTypes LineStyle { get; set; }
+        public Vatsim.LineStyle LineStyle { get; set; }
 
-        [XmlElement("BCGGroup", DataType = "integer")]
+        [XmlElement("BCGGroup")]
         public string BcgGroup { get; set; }
 
         public Colors Color { get; set; }
 
-        [XmlElement(DataType = "integer")] public string Thickness { get; set; }
+        public string Thickness { get; set; }
 
-        [XmlArrayItem("FilterGroup", DataType = "integer", IsNullable = false)]
-        public List<string> GeoLineFilters { get; set; }
+        [XmlArray("GeoLineFilters")]
+        [XmlArrayItem("FilterGroup")]
+        public string[] GeoLineFilters { get; set; }
     }
 }
