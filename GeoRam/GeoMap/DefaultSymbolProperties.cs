@@ -11,14 +11,16 @@ namespace GeoMapConverter.GeoRam.GeoMap
         public Vatsim.SymbolStyle SymbolStyle { get; set; }
 
         [XmlElement("BCGGroup")]
-        public string BcgGroup { get; set; }
+        public int BcgGroup { get; set; }
 
-        public Colors Color { get; set; }
+        public int FontSize { get; set; }
 
-        public string FontSize { get; set; }
+        [XmlElement("GeoSymbolFilters")]
+        public GeoSymbolFilter GeoSymbolFilters { get; set; }
 
-        [XmlArray("GeoSymbolFilters")]
-        [XmlArrayItem("FilterGroup")]
-        public string[] GeoSymbolFilters { get; set; }
+        public DefaultSymbolProperties()
+        {
+            GeoSymbolFilters = new GeoSymbolFilter();
+        }
     }
 }

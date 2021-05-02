@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace GeoMapConverter.Vatsim
@@ -28,7 +29,7 @@ namespace GeoMapConverter.Vatsim
         public string BcgGroup { get; set; }
 
         [XmlIgnore]
-        public string FilterGroup { get; set; }
+        public string FilterGroup => Objects.Select(t => t.Filter).FirstOrDefault();
 
         public GeoMap()
         {

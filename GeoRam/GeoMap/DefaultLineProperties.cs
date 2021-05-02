@@ -11,14 +11,22 @@ namespace GeoMapConverter.GeoRam.GeoMap
         public Vatsim.LineStyle LineStyle { get; set; }
 
         [XmlElement("BCGGroup")]
-        public string BcgGroup { get; set; }
+        public int BcgGroup { get; set; }
 
-        public Colors Color { get; set; }
+        public int Thickness { get; set; }
 
-        public string Thickness { get; set; }
+        [XmlElement("GeoLineFilters")]
+        public FilterGroup GeoLineFilters { get; set; }
 
-        [XmlArray("GeoLineFilters")]
-        [XmlArrayItem("FilterGroup")]
-        public string[] GeoLineFilters { get; set; }
+        public DefaultLineProperties()
+        {
+            GeoLineFilters = new FilterGroup();
+        }
+    }
+
+    public class FilterGroup
+    {
+        [XmlElement("FilterGroup")]
+        public int Id { get; set; }
     }
 }

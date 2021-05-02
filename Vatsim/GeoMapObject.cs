@@ -26,55 +26,37 @@ namespace GeoMapConverter.Vatsim
 		[XmlIgnore]
 		public int BcgGroup { get; set; }
 
-		[XmlIgnore]
-		public List<string> Filters { get; set; }
+        [XmlIgnore]
+        public string Filter
+        {
+            get
+            {
+                if (LineDefaults != null)
+                {
+                    return LineDefaults.Filters.ToString();
+                }
 
-		[XmlIgnore]
-		public string FilterList {
-			get {
-				if (Filters.Count > 0) {
-					return string.Join(",", Filters);
-				}
-				return "";
-			}
-			set {
-				if (!string.IsNullOrEmpty(value)) {
-					Filters = value.Split(',').Select(a => a).ToList();
-				}
-			}
-		}
+                if (TextDefaults != null)
+                {
+                    return TextDefaults.Filters.ToString();
+                }
 
-		[XmlIgnore]
-		public List<string> Filters2 {
-			get {
-				List<string> temp = new List<string>();
-				if (LineDefaults != null) {
-					if (LineDefaults.Filters != null) {
-						temp.Add(LineDefaults.Filters);
-					}
-				}
-				if (SymbolDefaults != null) {
-					if (SymbolDefaults.Filters != null) {
-						temp.Add(SymbolDefaults.Filters);
-					}
-				}
-				if (TextDefaults != null) {
-					if (TextDefaults.Filters != null) {
-						temp.Add(TextDefaults.Filters);
-					}
-				}
-				return temp;
-			}
-		}
+                if (SymbolDefaults != null)
+                {
+                    return SymbolDefaults.Filters.ToString();
+                }
 
-		public GeoMapObject()
-		{
-			Description = "";
-			Elements = new List<Element>();
-			Filters = new List<string>();
-		}
+                return "";
+            }
+        }
 
-		public override string ToString()
+        public GeoMapObject()
+        {
+            Description = "";
+            Elements = new List<Element>();
+        }
+
+        public override string ToString()
 		{
 			return string.IsNullOrEmpty(Description) ? "(no description)" : Description;
 		}

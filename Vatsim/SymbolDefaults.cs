@@ -10,11 +10,6 @@ namespace GeoMapConverter.Vatsim
         public SymbolStyle Style { get; set; }
 
         [XmlAttribute]
-        public string Size { get; set; }
-
-        public SymbolDefaults()
-        {
-            Size = "1";
-        }
+        public int Size { get; set; } = 1;
     }
 }

@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
 namespace GeoMapConverter.Vatsim
 {
+    [Serializable]
     [XmlType("FilterMenuItem")]
     public class FilterMenuItem
     {
@@ -15,16 +17,18 @@ namespace GeoMapConverter.Vatsim
         public string LabelLine2 { get; set; }
 
         [XmlIgnore]
-        public string MenuPosition { get; set; }
+        public int MenuPosition { get; set; }
 
         [XmlIgnore]
-        public List<string> FilterGroups { get; set; }
+        public int FilterGroup { get; set; }
+
+        [XmlIgnore]
+        public int OurId { get; set; }
 
         public FilterMenuItem()
         {
             LabelLine1 = "";
             LabelLine2 = "";
-            FilterGroups = new List<string>();
         }
 
         public override string ToString()
@@ -32,7 +36,7 @@ namespace GeoMapConverter.Vatsim
             if (string.IsNullOrEmpty(LabelLine1) && string.IsNullOrEmpty(LabelLine2)) {
                 return "(no labels)";
             }
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(LabelLine1)) {
                 sb.Append(LabelLine1);
             }

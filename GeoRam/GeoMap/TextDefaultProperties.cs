@@ -9,7 +9,7 @@ namespace GeoMapConverter.GeoRam.GeoMap
     public class TextDefaultProperties
     {
         [XmlElement("BCGGroup")]
-        public string BcgGroup { get; set; }
+        public int BcgGroup { get; set; }
 
         public Colors Color { get; set; }
 
@@ -23,8 +23,18 @@ namespace GeoMapConverter.GeoRam.GeoMap
 
         public int YPixelOffset { get; set; }
 
-        [XmlArray("GeoTextFilters")]
-        [XmlArrayItem("FilterGroup")]
-        public string[] GeoTextFilters { get; set; }
+        [XmlElement("GeoTextFilters")]
+        public GeoTextFilter GeoTextFilters { get; set; }
+
+        public TextDefaultProperties()
+        {
+            GeoTextFilters = new GeoTextFilter();
+        }
+    }
+
+    public class GeoTextFilter
+    {
+        [XmlElement("FilterGroup")]
+        public int Id { get; set; }
     }
 }

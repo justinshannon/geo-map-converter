@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,22 @@ namespace GeoMapConverter.Utils
                     yield return enumerator2.Current;
                 }
             }
+        }
+
+        public static int IndexOfByKey<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value)
+        {
+            int i = 0;
+            foreach (var pair in dictionary)
+            {
+                if (pair.Value.Equals(value))
+                {
+                    return i;
+                }
+
+                i++;
+            }
+
+            return -1;
         }
     }
 }

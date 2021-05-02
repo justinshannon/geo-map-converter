@@ -14,7 +14,10 @@ namespace GeoMapConverter.Vatsim
         public int MenuPosition { get; set; }
 
         [XmlIgnore]
-        public List<string> BcgGroups { get; set; }
+        public int BcgGroups { get; set; }
+
+        [XmlIgnore]
+        public int OurId { get; set; }
 
         public BcgMenuItem()
         {

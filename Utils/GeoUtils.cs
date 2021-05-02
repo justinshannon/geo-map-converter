@@ -3,9 +3,9 @@ using System.Text.RegularExpressions;
 
 namespace GeoMapConverter.Utils
 {
-    public static class StringUtils
+    public static class GeoUtils
     {
-        public static double ToDecimalDegrees(string value, bool isLat = true)
+        public static double ToDecimalDegrees(this string value, bool isLat = true)
         {
             double deg;
             double min;

@@ -14,11 +14,6 @@ namespace GeoMapConverter.Vatsim
         public LineStyle Style { get; set; }
 
         [XmlAttribute("Thickness")]
-        public string Thickness { get; set; }
-
-        public LineDefaults()
-        {
-            Thickness = "1";
-        }
+        public int Thickness { get; set; } = 1;
     }
 }

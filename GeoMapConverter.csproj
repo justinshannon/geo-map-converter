@@ -63,6 +63,7 @@
     <Compile Include="GeoRam\GeoMap\GeoMapText.cs" />
     <Compile Include="GeoRam\GeoMap\Enums\Colors.cs" />
     <Compile Include="GeoRam\GeoMap\Enums\SymbolTypes.cs" />
+    <Compile Include="GeoRam\GeoMap\GeoSymbolFilter.cs" />
     <Compile Include="GeoRam\GeoMap\TextDefaultProperties.cs" />
     <Compile Include="MyTreeView.cs">
       <SubType>Component</SubType>
@@ -78,7 +79,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\SerializationUtils.cs" />
     <Compile Include="Utils\ListUtils.cs" />
-    <Compile Include="Utils\StringUtils.cs" />
+    <Compile Include="Utils\GeoUtils.cs" />
+    <Compile Include="Utils\Utils.cs" />
     <Compile Include="Vatsim\BcgMenu.cs" />
     <Compile Include="Vatsim\BcgMenuItem.cs" />
     <Compile Include="Vatsim\Element.cs" />

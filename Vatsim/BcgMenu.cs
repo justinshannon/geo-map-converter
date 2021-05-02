@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace GeoMapConverter.Vatsim
@@ -18,6 +19,11 @@ namespace GeoMapConverter.Vatsim
         {
             Name = "";
             Items = new List<BcgMenuItem>();
+        }
+
+        public BcgMenu ItemByGroupId(int id)
+        {
+            return Items.Any(t => t.BcgGroups == id) ? this : null;
         }
 
         public override string ToString()

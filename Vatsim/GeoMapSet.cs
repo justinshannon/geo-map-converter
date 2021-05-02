@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace GeoMapConverter.Vatsim
 {
+    [Serializable]
     [XmlRoot("GeoMapSet")]
     public class GeoMapSet
     {
@@ -15,8 +13,7 @@ namespace GeoMapConverter.Vatsim
 
         [XmlArray("BcgMenus")]
         [XmlArrayItem("BcgMenu")]
-        public List<BcgMenu> BcgMenus { get; set
-                ; }
+        public List<BcgMenu> BcgMenus { get; set; }
 
         [XmlArray("FilterMenus")]
         [XmlArrayItem("FilterMenu")]
