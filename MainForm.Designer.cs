@@ -109,7 +109,7 @@
             this.MinimizeBox = false;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "GeoMap Converter";
+            this.Text = "GeoMap to vERAM Converter";
             this.ResumeLayout(false);
 
         }

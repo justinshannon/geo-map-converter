@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,8 +14,6 @@ namespace GeoMapConverter
     public partial class MainForm : Form
     {
         private readonly SynchronizationContext mContext;
-        private readonly CancellationTokenSource mCancellationToken;
-
         private readonly List<Vatsim.BcgMenu> mBcgMenus = new List<BcgMenu>();
         private readonly List<Vatsim.FilterMenu> mFilterMenus = new List<FilterMenu>();
         private readonly Vatsim.GeoMapSet mGeoMapSet = new GeoMapSet();
@@ -26,13 +23,6 @@ namespace GeoMapConverter
             InitializeComponent();
 
             mContext = SynchronizationContext.Current;
-            mCancellationToken = new CancellationTokenSource();
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            base.OnClosing(e);
-            mCancellationToken.Cancel();
         }
 
         private async void btnOpenConsoleCommand_Click(object sender, EventArgs e)
@@ -47,14 +37,10 @@ namespace GeoMapConverter
                 mFilterMenus.Clear();
                 myTreeView.Nodes.Clear();
 
-                await ProcessConsoleCommandFile().ContinueWith(_ =>
-                {
-                    mContext.Post(t =>
-                    {
-                        btnOpenGeoMaps.Enabled = true;
-                        btnOpenConsoleCommand.Enabled = true;
-                    }, null);
-                });
+                await Task.Run(ProcessConsoleCommandFile);
+
+                btnOpenGeoMaps.Enabled = true;
+                btnOpenConsoleCommand.Enabled = true;
             }
         }
 
@@ -67,222 +53,232 @@ namespace GeoMapConverter
                 btnOpenConsoleCommand.Enabled = false;
                 btnOpenGeoMaps.Enabled = false;
 
-                await ProcessGeoMapsFile().ContinueWith(_ =>
-                {
-                    mContext.Post(t =>
-                    {
-                        btnExport.Text = "Export Selected GeoMaps";
-                        btnExport.Enabled = true;
-                        btnOpenGeoMaps.Enabled = true;
-                        btnOpenConsoleCommand.Enabled = true;
-                    }, null);
-                });
+                await Task.Run(ProcessGeoMapsFile);
+
+                btnExport.Text = "Export Selected GeoMaps";
+                btnExport.Enabled = true;
+                btnOpenGeoMaps.Enabled = true;
+                btnOpenConsoleCommand.Enabled = true;
             }
         }
 
-        private async Task ProcessConsoleCommandFile()
+        private async void BtnExport_Click(object sender, EventArgs e)
         {
-            await Task.Run(() =>
+            btnExport.Text = "Processing... Please Wait";
+            btnExport.Enabled = false;
+
+            var filtered = await Task.Run(CreateExportFile);
+
+            btnExport.Text = "Export Selected GeoMaps";
+            btnExport.Enabled = true;
+
+            if (dlgSaveMaps.ShowDialog(this) == DialogResult.OK)
             {
-                var obj =
-                    SerializationUtils.DeserializeObjectFromFile<ConsoleCommandControlRecords>(dlgConsoleCommand
-                        .FileName);
+                SerializationUtils.SerializeObjectToFile(filtered, dlgSaveMaps.FileName);
+            }
+        }
 
-                obj.MapBrightnessMenus.ForEach(menu =>
+        private void ProcessConsoleCommandFile()
+        {
+            var obj =
+                SerializationUtils.DeserializeObjectFromFile<ConsoleCommandControlRecords>(dlgConsoleCommand
+                    .FileName);
+
+            obj.MapBrightnessMenus.ForEach(menu =>
+            {
+                var bcg = new Vatsim.BcgMenu
                 {
-                    var bcg = new Vatsim.BcgMenu
-                    {
-                        Name = menu.BcgMenuName
-                    };
+                    Name = menu.BcgMenuName
+                };
 
-                    foreach (var btn in menu.MapBcgButtons)
+                var id = 1;
+                foreach (var btn in menu.MapBcgButtons)
+                {
+                    bcg.Items.Add(new Vatsim.BcgMenuItem()
                     {
-                        bcg.Items.Add(new Vatsim.BcgMenuItem()
-                        {
-                            Label = btn.Label,
-                            MenuPosition = btn.MenuPosition,
-                            BcgGroups = btn.MapBcgGroups.BcgGroup
-                        });
+                        Label = btn.Label,
+                        MenuPosition = btn.MenuPosition,
+                        BcgGroups = btn.MapBcgGroups.BcgGroup,
+                        OurId = id++
+                    });
+                }
+
+                mBcgMenus.Add(bcg);
+            });
+
+            obj.MapFilterMenus.ForEach(menu =>
+            {
+                var filter = new Vatsim.FilterMenu()
+                {
+                    Name = menu.FilterMenuName
+                };
+
+                mContext.Post(t =>
+                {
+                    if (!myTreeView.Nodes.ContainsKey(filter.Name))
+                    {
+                        myTreeView.Nodes.Add(filter.Name, filter.Name);
                     }
+                }, null);
 
-                    mBcgMenus.Add(bcg);
-                });
-
-                obj.MapFilterMenus.ForEach(menu =>
+                var id = 1;
+                foreach (var btn in menu.MapFilterButtons)
                 {
-                    var filter = new Vatsim.FilterMenu()
+                    filter.Items.Add(new FilterMenuItem()
                     {
-                        Name = menu.FilterMenuName
-                    };
+                        LabelLine1 = btn.LabelLine1,
+                        LabelLine2 = btn.LabelLine2,
+                        MenuPosition = btn.MenuPosition,
+                        FilterGroup = btn.MapFilterGroup.Group,
+                        OurId = id++
+                    });
 
                     mContext.Post(t =>
                     {
-                        if (!myTreeView.Nodes.ContainsKey(filter.Name))
+                        var node = new TreeNode(btn.FilterButtonName)
                         {
-                            myTreeView.Nodes.Add(filter.Name, filter.Name);
-                        }
+                            Tag = btn.MapFilterGroup.Group
+                        };
+                        myTreeView.Nodes[filter.Name].Nodes.Add(node);
                     }, null);
+                }
 
-                    foreach (var btn in menu.MapFilterButtons)
-                    {
-                        filter.Items.Add(new FilterMenuItem()
-                        {
-                            LabelLine1 = btn.LabelLine1,
-                            LabelLine2 = btn.LabelLine2,
-                            MenuPosition = btn.MenuPosition,
-                            FilterGroup = btn.MapFilterGroup.Group
-                        });
-
-                        mContext.Post(t =>
-                        {
-                            var node = new TreeNode(btn.FilterButtonName)
-                            {
-                                Tag = btn.MapFilterGroup.Group
-                            };
-                            myTreeView.Nodes[filter.Name].Nodes.Add(node);
-                        }, null);
-                    }
-
-                    mFilterMenus.Add(filter);
-                });
-
-            }, mCancellationToken.Token);
+                mFilterMenus.Add(filter);
+            });
         }
 
-        private async Task ProcessGeoMapsFile()
+        private void ProcessGeoMapsFile()
         {
-            await Task.Run(() =>
+            var xml = SerializationUtils.DeserializeObjectFromFile<GeoMapRecords>(dlgGeoMaps.FileName);
+
+            mGeoMapSet.BcgMenus = mBcgMenus;
+            mGeoMapSet.FilterMenus = mFilterMenus;
+
+            xml.GeoMapRecordList.ForEach(geomap =>
             {
-                var xml = SerializationUtils.DeserializeObjectFromFile<GeoMapRecords>(dlgGeoMaps.FileName);
-
-                mGeoMapSet.BcgMenus = mBcgMenus;
-                mGeoMapSet.FilterMenus = mFilterMenus;
-
-                xml.GeoMapRecordList.ForEach(geomap =>
+                var map = new Vatsim.GeoMap
                 {
-                    var map = new Vatsim.GeoMap
+                    Name = geomap.GeomapId,
+                    LabelLine1 = geomap.LabelLine1,
+                    LabelLine2 = geomap.LabelLine2,
+                    BcgMenuName = geomap.BcgMenuName,
+                    FilterMenuName = geomap.FilterMenuName
+                };
+
+                geomap.GeoMapObjectList.ForEach(obj =>
+                {
+                    var mapobj = new Vatsim.GeoMapObject();
+
+                    if (obj.DefaultLineProperties != null)
                     {
-                        Name = geomap.GeomapId,
-                        LabelLine1 = geomap.LabelLine1,
-                        LabelLine2 = geomap.LabelLine2,
-                        BcgMenuName = geomap.BcgMenuName,
-                        FilterMenuName = geomap.FilterMenuName
-                    };
+                        mapobj.LineDefaults = new LineDefaults
+                        {
+                            Style = obj.DefaultLineProperties.LineStyle,
+                            Thickness = obj.DefaultLineProperties.Thickness,
+                            BcgGroup = obj.DefaultLineProperties.BcgGroup,
+                            Filters = obj.DefaultLineProperties.GeoLineFilters.Id
+                        };
+                    }
 
-                    geomap.GeoMapObjectList.ForEach(obj =>
+                    if (obj.DefaultSymbolProperties != null)
                     {
-                        var mapobj = new Vatsim.GeoMapObject();
-
-                        if (obj.DefaultLineProperties != null)
+                        mapobj.SymbolDefaults = new SymbolDefaults()
                         {
-                            mapobj.LineDefaults = new LineDefaults
-                            {
-                                Style = obj.DefaultLineProperties.LineStyle,
-                                Thickness = obj.DefaultLineProperties.Thickness,
-                                BcgGroup = obj.DefaultLineProperties.BcgGroup,
-                                Filters = obj.DefaultLineProperties.GeoLineFilters.Id
-                            };
-                        }
+                            Style = obj.DefaultSymbolProperties.SymbolStyle,
+                            Size = obj.DefaultSymbolProperties.FontSize,
+                            BcgGroup = obj.DefaultSymbolProperties.BcgGroup,
+                            Filters = obj.DefaultSymbolProperties.GeoSymbolFilters.Id
+                        };
+                    }
 
-                        if (obj.DefaultSymbolProperties != null)
+                    if (obj.TextDefaultProperties != null)
+                    {
+                        mapobj.TextDefaults = new TextDefaults()
                         {
-                            mapobj.SymbolDefaults = new SymbolDefaults()
-                            {
-                                Style = obj.DefaultSymbolProperties.SymbolStyle,
-                                Size = obj.DefaultSymbolProperties.FontSize,
-                                BcgGroup = obj.DefaultSymbolProperties.BcgGroup,
-                                Filters = obj.DefaultSymbolProperties.GeoSymbolFilters.Id
-                            };
-                        }
+                            Opaque = false,
+                            Size = obj.TextDefaultProperties.FontSize,
+                            Underline = obj.TextDefaultProperties.Underline,
+                            XOffset = obj.TextDefaultProperties.XPixelOffset,
+                            YOffset = obj.TextDefaultProperties.YPixelOffset,
+                            BcgGroup = obj.TextDefaultProperties.BcgGroup,
+                            Filters = obj.TextDefaultProperties.GeoTextFilters.Id
+                        };
+                    }
 
-                        if (obj.TextDefaultProperties != null)
+                    obj.GeoMapSymbolList.ForEach(geosymbol =>
+                    {
+                        if (geosymbol.GeoMapText != null)
                         {
-                            mapobj.TextDefaults = new TextDefaults()
-                            {
-                                Opaque = false,
-                                Size = obj.TextDefaultProperties.FontSize,
-                                Underline = obj.TextDefaultProperties.Underline,
-                                XOffset = obj.TextDefaultProperties.XPixelOffset,
-                                YOffset = obj.TextDefaultProperties.YPixelOffset,
-                                BcgGroup = obj.TextDefaultProperties.BcgGroup,
-                                Filters = obj.TextDefaultProperties.GeoTextFilters.Id
-                            };
-                        }
-
-                        obj.GeoMapSymbolList.ForEach(geosymbol =>
-                        {
-                            if (geosymbol.GeoMapText != null)
-                            {
-                                var offset = 0;
-                                foreach (var text in geosymbol.GeoMapText.GeoTextStrings.Select(line => new Vatsim.Text
-                                {
-                                    Lat = geosymbol.Latitude.ToDecimalDegrees(),
-                                    Lon = geosymbol.Longitude.ToDecimalDegrees(false),
-                                    Lines = line,
-                                    Size = geosymbol.FontSize,
-                                    YOffset = offset += (5 * geosymbol.FontSize)
-                                }))
-                                {
-                                    mapobj.Elements.Add(text);
-                                }
-                            }
-
-                            var symbol = new Vatsim.Symbol()
+                            var offset = 0;
+                            foreach (var text in geosymbol.GeoMapText.GeoTextStrings.Select(line => new Vatsim.Text
                             {
                                 Lat = geosymbol.Latitude.ToDecimalDegrees(),
                                 Lon = geosymbol.Longitude.ToDecimalDegrees(false),
-                                Size = geosymbol.FontSize,
-                                Style = (SymbolStyle) geosymbol.SymbolStyle
-                            };
-                            mapobj.Elements.Add(symbol);
-                        });
-
-                        obj.GeoMapLineList.ForEach(geoline =>
-                        {
-                            var line = new Vatsim.Line
-                            {
-                                StartLat = geoline.StartLatitude.ToDecimalDegrees(),
-                                StartLon = geoline.StartLongitude.ToDecimalDegrees(false),
-                                EndLat = geoline.EndLatitude.ToDecimalDegrees(),
-                                EndLon = geoline.EndLongitude.ToDecimalDegrees(false)
-                            };
-                            mapobj.Elements.Add(line);
-                        });
-
-                        obj.GeoMapTextList.ForEach(geotext =>
-                        {
-                            foreach (var text in geotext.GeoTextStrings.Select(line => new Vatsim.Text
-                            {
-                                Lat = geotext.Latitude.ToDecimalDegrees(),
-                                Lon = geotext.Longitude.ToDecimalDegrees(false),
                                 Lines = line,
-                                Underline = geotext.Underline,
-                                Size = geotext.FontSize
+                                Size = geosymbol.FontSize,
+                                YOffset = offset += (5 * geosymbol.FontSize)
                             }))
                             {
                                 mapobj.Elements.Add(text);
                             }
-                        });
+                        }
 
-                        mapobj.Description = $"Object #{obj.MapGroupId} ({obj.MapObjectType})";
-
-                        map.Objects.Add(mapobj);
+                        var symbol = new Vatsim.Symbol()
+                        {
+                            Lat = geosymbol.Latitude.ToDecimalDegrees(),
+                            Lon = geosymbol.Longitude.ToDecimalDegrees(false),
+                            Size = geosymbol.FontSize,
+                            Style = (SymbolStyle) geosymbol.SymbolStyle
+                        };
+                        mapobj.Elements.Add(symbol);
                     });
 
-                    mGeoMapSet.GeoMaps.Add(map);
+                    obj.GeoMapLineList.ForEach(geoline =>
+                    {
+                        var line = new Vatsim.Line
+                        {
+                            StartLat = geoline.StartLatitude.ToDecimalDegrees(),
+                            StartLon = geoline.StartLongitude.ToDecimalDegrees(false),
+                            EndLat = geoline.EndLatitude.ToDecimalDegrees(),
+                            EndLon = geoline.EndLongitude.ToDecimalDegrees(false)
+                        };
+                        mapobj.Elements.Add(line);
+                    });
+
+                    obj.GeoMapTextList.ForEach(geotext =>
+                    {
+                        foreach (var text in geotext.GeoTextStrings.Select(line => new Vatsim.Text
+                        {
+                            Lat = geotext.Latitude.ToDecimalDegrees(),
+                            Lon = geotext.Longitude.ToDecimalDegrees(false),
+                            Lines = line,
+                            Underline = geotext.Underline,
+                            Size = geotext.FontSize
+                        }))
+                        {
+                            mapobj.Elements.Add(text);
+                        }
+                    });
+
+                    mapobj.Description = $"Object #{obj.MapGroupId} ({obj.MapObjectType})";
+
+                    map.Objects.Add(mapobj);
                 });
 
-            }, mCancellationToken.Token);
+                mGeoMapSet.GeoMaps.Add(map);
+            });
         }
 
-        private void BtnExport_Click(object sender, EventArgs e)
+        private GeoMapSet CreateExportFile()
         {
+            var filtered = new GeoMapSet();
+
             var checkedMaps = new Dictionary<string, List<string>>();
 
             var x = myTreeView.Nodes.Cast<TreeNode>()
                 .Sum(node => node.Nodes.Cast<TreeNode>().Count(child => child.Checked));
 
-            if (x == 0) return;
+            if (x == 0) return null;
 
             foreach (TreeNode node in myTreeView.Nodes)
             {
@@ -300,12 +296,14 @@ namespace GeoMapConverter
                 }
             }
 
-            var filtered = new GeoMapSet();
-            var copy = mGeoMapSet.DeepClone();
+            var clone = mGeoMapSet.DeepClone();
 
             foreach (var chk in checkedMaps)
             {
-                var maps = copy.GeoMaps.Where(t => t.FilterMenuName == chk.Key);
+                filtered.BcgMenus.AddRange(clone.BcgMenus.Where(t => t.Name == chk.Key));
+                filtered.FilterMenus.AddRange(clone.FilterMenus.Where(t => t.Name == chk.Key));
+
+                var maps = clone.GeoMaps.Where(t => t.FilterMenuName == chk.Key);
                 foreach (var map in maps)
                 {
                     var filteredMap = new GeoMap
@@ -380,80 +378,7 @@ namespace GeoMapConverter
                         filtered.GeoMaps.Add(filteredMap);
                     }
                 }
-
-                var filterMenus = copy.FilterMenus.Where(t => t.Name == chk.Key);
-                foreach (var menu in filterMenus)
-                {
-                    var filterMenu = new FilterMenu()
-                    {
-                        Name = menu.Name,
-                        Items = new List<FilterMenuItem>()
-                    };
-
-                    var ourId = 1;
-                    foreach (var item in menu.Items)
-                    {
-                        if (chk.Value.Contains(item.FilterGroup.ToString()))
-                        {
-                            var menuItem = new FilterMenuItem()
-                            {
-                                FilterGroup = item.FilterGroup,
-                                LabelLine1 = item.LabelLine1,
-                                LabelLine2 = item.LabelLine2,
-                                MenuPosition = item.MenuPosition,
-                                OurId = ourId++
-                            };
-                            filterMenu.Items.Add(menuItem);
-                        }
-                    }
-
-                    if (filterMenu.Items.Count > 0)
-                    {
-                        filtered.FilterMenus.Add(filterMenu);
-                    }
-                }
-
-                var bcgMenus = copy.BcgMenus.Where(t => t.Name == chk.Key);
-                foreach (var menu in bcgMenus)
-                {
-                    var bcgMenu = new BcgMenu()
-                    {
-                        Name = menu.Name,
-                        Items = new List<BcgMenuItem>()
-                    };
-
-                    var ourId = 1;
-                    foreach (var item in menu.Items)
-                    {
-                        if (chk.Value.Contains(item.BcgGroups.ToString()))
-                        {
-                            var menuItem = new BcgMenuItem()
-                            {
-                                BcgGroups = item.BcgGroups,
-                                Label = item.Label,
-                                MenuPosition = item.MenuPosition,
-                                OurId = ourId++
-                            };
-                            bcgMenu.Items.Add(menuItem);
-                        }
-                    }
-
-                    if (bcgMenu.Items.Count > 0)
-                    {
-                        filtered.BcgMenus.Add(bcgMenu);
-                    }
-                }
             }
-
-            //foreach (var bcg in filtered.BcgMenus)
-            //{
-            //    Console.WriteLine(bcg.Name);
-            //    foreach (var item in bcg.Items)
-            //    {
-            //        Console.WriteLine(item.Label + ": " + item.BcgGroups + " -> " + item.OurId);
-            //    }
-            //    Console.WriteLine("-----------------");
-            //}
 
             foreach (var map in filtered.GeoMaps)
             {
@@ -461,40 +386,40 @@ namespace GeoMapConverter
                 {
                     if (obj.LineDefaults != null)
                     {
-                        var prevId = obj.LineDefaults.Filters;
-                        var newId = filtered.FilterMenus.Where(t => t.Name == map.FilterMenuName)
-                            .SelectMany(a => a.Items).FirstOrDefault(b => b.FilterGroup == prevId).OurId;
+                        var newFilter = filtered.FilterMenus.Where(t => t.Name == map.FilterMenuName)
+                            .SelectMany(t => t.Items).FirstOrDefault(t => t.FilterGroup == obj.LineDefaults.Filters);
+                        obj.LineDefaults.Filters = newFilter.OurId;
 
-                        obj.LineDefaults.BcgGroup = newId;
-                        obj.LineDefaults.Filters = newId;
-                    }
-
-                    if (obj.TextDefaults != null)
-                    {
-                        var prevId = obj.TextDefaults.Filters;
-                        var newId = filtered.FilterMenus.Where(t => t.Name == map.FilterMenuName)
-                            .SelectMany(a => a.Items).FirstOrDefault(b => b.FilterGroup == prevId).OurId;
-
-                        obj.TextDefaults.BcgGroup = newId;
-                        obj.TextDefaults.Filters = newId;
+                        var newBcgFilter = filtered.BcgMenus.Where(t => t.Name == map.BcgMenuName)
+                            .SelectMany(t => t.Items).FirstOrDefault(t => t.BcgGroups == obj.LineDefaults.BcgGroup);
+                        obj.LineDefaults.BcgGroup = newBcgFilter.OurId;
                     }
 
                     if (obj.SymbolDefaults != null)
                     {
-                        var prevId = obj.SymbolDefaults.Filters;
-                        var newId = filtered.FilterMenus.Where(t => t.Name == map.FilterMenuName)
-                            .SelectMany(a => a.Items).FirstOrDefault(b => b.FilterGroup == prevId).OurId;
+                        var newFilter = filtered.FilterMenus.Where(t => t.Name == map.FilterMenuName)
+                            .SelectMany(t => t.Items).FirstOrDefault(t => t.FilterGroup == obj.SymbolDefaults.Filters);
+                        obj.SymbolDefaults.Filters = newFilter.OurId;
 
-                        obj.SymbolDefaults.BcgGroup = newId;
-                        obj.SymbolDefaults.Filters = newId;
+                        var newBcgFilter = filtered.BcgMenus.Where(t => t.Name == map.BcgMenuName)
+                            .SelectMany(t => t.Items).FirstOrDefault(t => t.BcgGroups == obj.SymbolDefaults.BcgGroup);
+                        obj.SymbolDefaults.BcgGroup = newBcgFilter.OurId;
+                    }
+
+                    if (obj.TextDefaults != null)
+                    {
+                        var newFilter = filtered.FilterMenus.Where(t => t.Name == map.FilterMenuName)
+                            .SelectMany(t => t.Items).FirstOrDefault(t => t.FilterGroup == obj.TextDefaults.Filters);
+                        obj.TextDefaults.Filters = newFilter.OurId;
+
+                        var newBcgFilter = filtered.BcgMenus.Where(t => t.Name == map.BcgMenuName)
+                            .SelectMany(t => t.Items).FirstOrDefault(t => t.BcgGroups == obj.TextDefaults.BcgGroup);
+                        obj.TextDefaults.BcgGroup = newBcgFilter.OurId;
                     }
                 }
             }
 
-            if (dlgSaveMaps.ShowDialog(this) == DialogResult.OK)
-            {
-                SerializationUtils.SerializeObjectToFile(filtered, dlgSaveMaps.FileName);
-            }
+            return filtered;
         }
 
         private void TreeView_AfterCheck(object sender, TreeViewEventArgs e)
