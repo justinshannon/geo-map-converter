@@ -388,33 +388,51 @@ namespace GeoMapConverter
                     {
                         var newFilter = filtered.FilterMenus.Where(t => t.Name == map.FilterMenuName)
                             .SelectMany(t => t.Items).FirstOrDefault(t => t.FilterGroup == obj.LineDefaults.Filters);
-                        obj.LineDefaults.Filters = newFilter.OurId;
+                        if (newFilter != null)
+                        {
+                            obj.LineDefaults.Filters = newFilter.OurId;
+                        }
 
                         var newBcgFilter = filtered.BcgMenus.Where(t => t.Name == map.BcgMenuName)
                             .SelectMany(t => t.Items).FirstOrDefault(t => t.BcgGroups == obj.LineDefaults.BcgGroup);
-                        obj.LineDefaults.BcgGroup = newBcgFilter.OurId;
+                        if (newBcgFilter != null)
+                        {
+                            obj.LineDefaults.BcgGroup = newBcgFilter.OurId;
+                        }
                     }
 
                     if (obj.SymbolDefaults != null)
                     {
                         var newFilter = filtered.FilterMenus.Where(t => t.Name == map.FilterMenuName)
                             .SelectMany(t => t.Items).FirstOrDefault(t => t.FilterGroup == obj.SymbolDefaults.Filters);
-                        obj.SymbolDefaults.Filters = newFilter.OurId;
+                        if (newFilter != null)
+                        {
+                            obj.SymbolDefaults.Filters = newFilter.OurId;
+                        }
 
                         var newBcgFilter = filtered.BcgMenus.Where(t => t.Name == map.BcgMenuName)
                             .SelectMany(t => t.Items).FirstOrDefault(t => t.BcgGroups == obj.SymbolDefaults.BcgGroup);
-                        obj.SymbolDefaults.BcgGroup = newBcgFilter.OurId;
+                        if (newBcgFilter != null)
+                        {
+                            obj.SymbolDefaults.BcgGroup = newBcgFilter.OurId;
+                        }
                     }
 
                     if (obj.TextDefaults != null)
                     {
                         var newFilter = filtered.FilterMenus.Where(t => t.Name == map.FilterMenuName)
                             .SelectMany(t => t.Items).FirstOrDefault(t => t.FilterGroup == obj.TextDefaults.Filters);
-                        obj.TextDefaults.Filters = newFilter.OurId;
+                        if (newFilter != null)
+                        {
+                            obj.TextDefaults.Filters = newFilter.OurId;
+                        }
 
                         var newBcgFilter = filtered.BcgMenus.Where(t => t.Name == map.BcgMenuName)
                             .SelectMany(t => t.Items).FirstOrDefault(t => t.BcgGroups == obj.TextDefaults.BcgGroup);
-                        obj.TextDefaults.BcgGroup = newBcgFilter.OurId;
+                        if (newBcgFilter != null)
+                        {
+                            obj.TextDefaults.BcgGroup = newBcgFilter.OurId;
+                        }
                     }
                 }
             }
