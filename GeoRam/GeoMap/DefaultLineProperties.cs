@@ -16,11 +16,11 @@ namespace GeoMapConverter.GeoRam.GeoMap
         public int Thickness { get; set; }
 
         [XmlElement("GeoLineFilters")]
-        public FilterGroup GeoLineFilters { get; set; }
+        public List<FilterGroup> GeoLineFilters { get; set; }
 
         public DefaultLineProperties()
         {
-            GeoLineFilters = new FilterGroup();
+            GeoLineFilters = new List<FilterGroup>();
         }
     }
 

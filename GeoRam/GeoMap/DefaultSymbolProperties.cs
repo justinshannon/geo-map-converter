@@ -16,11 +16,11 @@ namespace GeoMapConverter.GeoRam.GeoMap
         public int FontSize { get; set; }
 
         [XmlElement("GeoSymbolFilters")]
-        public GeoSymbolFilter GeoSymbolFilters { get; set; }
+        public List<GeoSymbolFilter> GeoSymbolFilters { get; set; }
 
         public DefaultSymbolProperties()
         {
-            GeoSymbolFilters = new GeoSymbolFilter();
+            GeoSymbolFilters = new List<GeoSymbolFilter>();
         }
     }
 }

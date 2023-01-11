@@ -23,7 +23,7 @@ namespace GeoMapConverter.Vatsim
         public int FilterGroup { get; set; }
 
         [XmlIgnore]
-        public int OurId { get; set; }
+        public int LocalId { get; set; }
 
         public FilterMenuItem()
         {

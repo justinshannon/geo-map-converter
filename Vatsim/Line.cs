@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace GeoMapConverter.Vatsim
@@ -29,5 +30,11 @@ namespace GeoMapConverter.Vatsim
 
 		[XmlAttribute]
 		public double EndLon { get; set; }
+
+		[XmlIgnore]
+		public int BcgGroup { get; set; }
+
+		[XmlIgnore]
+		public List<int> FilterGroup { get; set; }
 	}
 }

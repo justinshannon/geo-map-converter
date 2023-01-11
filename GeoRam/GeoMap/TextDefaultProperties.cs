@@ -24,11 +24,11 @@ namespace GeoMapConverter.GeoRam.GeoMap
         public int YPixelOffset { get; set; }
 
         [XmlElement("GeoTextFilters")]
-        public GeoTextFilter GeoTextFilters { get; set; }
+        public List<GeoTextFilter> GeoTextFilters { get; set; }
 
         public TextDefaultProperties()
         {
-            GeoTextFilters = new GeoTextFilter();
+            GeoTextFilters = new List<GeoTextFilter>();
         }
     }
 

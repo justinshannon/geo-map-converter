@@ -23,32 +23,14 @@ namespace GeoMapConverter.Vatsim
 
 		public List<Element> Elements { get; set; }
 
-		[XmlIgnore]
-		public int BcgGroup { get; set; }
+        [XmlIgnore]
+        public List<int> FilterList { get; set; } = new List<int>();
 
         [XmlIgnore]
-        public string Filter
-        {
-            get
-            {
-                if (LineDefaults != null)
-                {
-                    return LineDefaults.Filters.ToString();
-                }
+        public string Filter => string.Join(",", FilterList);
 
-                if (TextDefaults != null)
-                {
-                    return TextDefaults.Filters.ToString();
-                }
-
-                if (SymbolDefaults != null)
-                {
-                    return SymbolDefaults.Filters.ToString();
-                }
-
-                return "";
-            }
-        }
+		[XmlIgnore]
+		public bool HasElements => Elements != null && Elements.Count > 0;
 
         public GeoMapObject()
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace GeoMapConverter.GeoRam.ConsoleCommand
@@ -17,6 +18,8 @@ namespace GeoMapConverter.GeoRam.ConsoleCommand
 
         [XmlIgnore]
         public string FilterButtonName => $"{LabelLine1} {LabelLine2}";
+
+        public override string ToString() => FilterButtonName;
     }
 
     public class MapFilterGroup

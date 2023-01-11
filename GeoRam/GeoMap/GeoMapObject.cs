@@ -27,5 +27,11 @@ namespace GeoMapConverter.GeoRam.GeoMap
 
         [XmlElement("GeoMapText")]
         public List<GeoMapText> GeoMapTextList { get; set; }
+
+        [XmlIgnore]
+        public bool HasFilterGroup =>
+            (DefaultLineProperties != null && DefaultLineProperties.GeoLineFilters.Count > 0 ||
+             DefaultSymbolProperties != null && DefaultSymbolProperties.GeoSymbolFilters.Count > 0 ||
+             TextDefaultProperties != null && TextDefaultProperties.GeoTextFilters.Count > 0);
     }
 }

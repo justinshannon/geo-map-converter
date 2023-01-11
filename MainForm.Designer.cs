@@ -34,23 +34,26 @@
             this.dlgConsoleCommand = new System.Windows.Forms.OpenFileDialog();
             this.dlgGeoMaps = new System.Windows.Forms.OpenFileDialog();
             this.dlgSaveMaps = new System.Windows.Forms.SaveFileDialog();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.txtStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.myTreeView = new GeoMapConverter.MyTreeView();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOpenConsoleCommand
             // 
-            this.btnOpenConsoleCommand.Location = new System.Drawing.Point(13, 12);
+            this.btnOpenConsoleCommand.Enabled = false;
+            this.btnOpenConsoleCommand.Location = new System.Drawing.Point(148, 12);
             this.btnOpenConsoleCommand.Name = "btnOpenConsoleCommand";
-            this.btnOpenConsoleCommand.Size = new System.Drawing.Size(208, 23);
+            this.btnOpenConsoleCommand.Size = new System.Drawing.Size(244, 23);
             this.btnOpenConsoleCommand.TabIndex = 1;
-            this.btnOpenConsoleCommand.Text = "Open Console Command Control XML";
+            this.btnOpenConsoleCommand.Text = "Open ConsoleCommandControl XML";
             this.btnOpenConsoleCommand.UseVisualStyleBackColor = true;
             this.btnOpenConsoleCommand.Click += new System.EventHandler(this.btnOpenConsoleCommand_Click);
             // 
             // btnOpenGeoMaps
             // 
-            this.btnOpenGeoMaps.Enabled = false;
-            this.btnOpenGeoMaps.Location = new System.Drawing.Point(227, 12);
+            this.btnOpenGeoMaps.Location = new System.Drawing.Point(13, 12);
             this.btnOpenGeoMaps.Name = "btnOpenGeoMaps";
             this.btnOpenGeoMaps.Size = new System.Drawing.Size(129, 23);
             this.btnOpenGeoMaps.TabIndex = 2;
@@ -63,7 +66,7 @@
             this.btnExport.Enabled = false;
             this.btnExport.Location = new System.Drawing.Point(12, 297);
             this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(344, 32);
+            this.btnExport.Size = new System.Drawing.Size(380, 32);
             this.btnExport.TabIndex = 3;
             this.btnExport.Text = "Export Selected GeoMaps";
             this.btnExport.UseVisualStyleBackColor = true;
@@ -86,12 +89,32 @@
             this.dlgSaveMaps.Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*";
             this.dlgSaveMaps.Title = "Save GeoMaps As...";
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.BackColor = System.Drawing.SystemColors.Info;
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.txtStatus});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 339);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(404, 22);
+            this.statusStrip1.SizingGrip = false;
+            this.statusStrip1.TabIndex = 6;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // txtStatus
+            // 
+            this.txtStatus.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtStatus.Name = "txtStatus";
+            this.txtStatus.Size = new System.Drawing.Size(203, 17);
+            this.txtStatus.Text = "Please open the GeoMap XML file...";
+            // 
             // myTreeView
             // 
             this.myTreeView.CheckBoxes = true;
+            this.myTreeView.Enabled = false;
             this.myTreeView.Location = new System.Drawing.Point(13, 41);
             this.myTreeView.Name = "myTreeView";
-            this.myTreeView.Size = new System.Drawing.Size(343, 250);
+            this.myTreeView.Size = new System.Drawing.Size(379, 250);
             this.myTreeView.TabIndex = 5;
             this.myTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeView_AfterCheck);
             // 
@@ -99,7 +122,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(369, 341);
+            this.ClientSize = new System.Drawing.Size(404, 361);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.myTreeView);
             this.Controls.Add(this.btnExport);
             this.Controls.Add(this.btnOpenGeoMaps);
@@ -108,9 +132,13 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "MainForm";
+            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "GeoMap to vERAM Converter";
+            this.Text = "GeoMap Converter";
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -122,6 +150,8 @@
         private System.Windows.Forms.OpenFileDialog dlgGeoMaps;
         private System.Windows.Forms.SaveFileDialog dlgSaveMaps;
         private MyTreeView myTreeView;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel txtStatus;
     }
 }
 

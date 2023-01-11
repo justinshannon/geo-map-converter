@@ -7,7 +7,7 @@ namespace GeoMapConverter.Vatsim
 	public class Symbol : Element
 	{
 		[XmlAttribute]
-		public SymbolStyle Style { get; set; }
+		public Vatsim.SymbolStyle Style { get; set; }
 
 		[XmlIgnore]
 		public bool StyleSpecified { get; set; }

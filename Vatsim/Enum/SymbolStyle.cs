@@ -24,6 +24,7 @@ namespace GeoMapConverter.Vatsim
 		OtherWaypoints,
 		Airport,
 		SatelliteAirport,
-		TACAN
+		TACAN,
+		DME
 	}
 }

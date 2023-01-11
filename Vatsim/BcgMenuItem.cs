@@ -17,7 +17,7 @@ namespace GeoMapConverter.Vatsim
         public int BcgGroups { get; set; }
 
         [XmlIgnore]
-        public int OurId { get; set; }
+        public int LocalId { get; set; }
 
         public BcgMenuItem()
         {

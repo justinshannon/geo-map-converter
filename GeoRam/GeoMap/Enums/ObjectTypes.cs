@@ -29,6 +29,7 @@ namespace GeoMapConverter.GeoRam.GeoMap.Enums
         SupplementalLine,
         SupplementalSymbol,
         AAV,
-        TAV
+        TAV,
+        DME
     }
 }

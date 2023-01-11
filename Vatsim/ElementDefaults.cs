@@ -12,10 +12,17 @@ namespace GeoMapConverter.Vatsim
     [XmlInclude(typeof(LineDefaults))]
     public class ElementDefaults
     {
+        [XmlIgnore]
+        public List<int> FilterList { get; set; } = new List<int>();
+
         [XmlAttribute("Bcg")]
         public int BcgGroup { get; set; }
 
         [XmlAttribute("Filters")]
-        public int Filters { get; set; }
+        public string Filters
+        {
+            get => FilterList.Count == 0 ? string.Join(",", Enumerable.Range(1, 20)) : string.Join(",", FilterList);
+            set => throw new NotSupportedException();
+        }
     }
 }
